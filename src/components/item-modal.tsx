@@ -56,7 +56,6 @@ export default function ItemModal({ item, open, onClose }: Props) {
   const [weights, setWeights] = useState<Weight[]>([]);
   const [editableWeight, setEditableWeight] = useState<Weight | null>(null);
   const [isAllowed, setIsAllowed] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!item?.internalName) return;
@@ -64,7 +63,6 @@ export default function ItemModal({ item, open, onClose }: Props) {
       .then((res) => res.json())
       .then((data) => setWeights(data))
       .catch(console.error)
-      .finally(() => setLoading(false));
   }, [item]);
 
 
@@ -123,7 +121,7 @@ export default function ItemModal({ item, open, onClose }: Props) {
 
   const generateWeightId = (itemName: string) => {
     const suffix = Math.random().toString(36).substring(2, 10); // 8-char suffix
-    return `${itemName.toLowerCase()}_${suffix}`;
+    return `wynnpool_${itemName.toLowerCase()}_${suffix}`;
   };
 
   return (
