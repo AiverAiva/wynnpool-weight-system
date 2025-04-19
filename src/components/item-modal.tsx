@@ -51,6 +51,14 @@ interface Props {
   onClose: () => void;
 }
 
+const STATIC_IDS = [
+  "rawStrength",
+  "rawDexterity",
+  "rawAgility",
+  "rawDefence",
+  "rawIntelligence",
+];
+
 export default function ItemModal({ item, open, onClose }: Props) {
   const { data: session } = useSession();
   const [weights, setWeights] = useState<Weight[]>([]);
@@ -177,13 +185,13 @@ export default function ItemModal({ item, open, onClose }: Props) {
                   {Object.entries(weight.identifications).map(([key, val]) => (
                     <li key={key} className="flex justify-between">
                       <span className="capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
-                      <span>{(val * 100)}%</span>
+                      <span>{(val * 100).toFixed(0)}%</span>
                     </li>
                   ))}
                 </ul>
 
                 <p className="text-xs text-right mt-1 text-muted-foreground">
-                  Total: {(total * 100)}%
+                  Total: {(total * 100).toFixed(0)}%
                 </p>
               </div>
             );
@@ -250,28 +258,34 @@ export default function ItemModal({ item, open, onClose }: Props) {
                   <div className="space-y-2">
                     <Label>Identifications</Label>
                     <div className="grid grid-cols-2 gap-2">
-                      {Object.keys(item.identifications || {}).map((key) => (
-                        <div key={key} className="flex items-center gap-2">
-                          <span className="capitalize w-28">{key.replace(/([A-Z])/g, " $1")}</span>
-                          <Input
-                            type="number"
-                            min={0}
-                            max={100}
-                            step={1}
-                            className="w-full"
-                            value={editableWeight.identifications[key] != null ? editableWeight.identifications[key] * 100 : ""}
-                            onChange={(e) => {
-                              const val = parseFloat(e.target.value);
-                              handleChangeWeight(key, isNaN(val) ? 0 : val / 100);
-                            }}
-                          />
-                        </div>
-                      ))}
+                      {Object.keys(item.identifications || {})
+                        .filter((key) => !STATIC_IDS.includes(key))
+                        .map((key) => (
+                          <div key={key} className="flex items-center gap-2">
+                            <span className="capitalize w-28">{key.replace(/([A-Z])/g, " $1")}</span>
+                            <Input
+                              type="number"
+                              min={0}
+                              max={100}
+                              step={0.01}
+                              className="w-full"
+                              value={
+                                editableWeight.identifications[key] != null
+                                  ? Math.round(editableWeight.identifications[key] * 100)
+                                  : ""
+                              }
+                              onChange={(e) => {
+                                const val = parseInt(e.target.value);
+                                handleChangeWeight(key, isNaN(val) ? 0 : val / 100);
+                              }}
+                            />
+                          </div>
+                        ))}
                     </div>
                   </div>
 
                   <p className="text-sm text-muted-foreground text-right mt-1">
-                    Total: {(totalPercent * 100)}%
+                    Total: {(totalPercent * 100).toFixed(0)}%
                   </p>
                   {!isValidTotal && (
                     <p className="text-sm text-destructive">Total must be 100%</p>
