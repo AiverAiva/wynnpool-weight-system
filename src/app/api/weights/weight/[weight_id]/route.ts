@@ -4,7 +4,7 @@ import { connectToDB } from "@/lib/mongodb";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { weight_id: string } }
+  { params }: { params: Promise<{ weight_id: string }> }
 ) {
   const session = await getServerSession(authOptions);
   const allowedIds = process.env.ALLOWED_IDS?.split(",") ?? [];
@@ -23,7 +23,7 @@ export async function PATCH(
   const collection = await connectToDB();
 
   const result = await collection.updateOne(
-    { weight_id: params.weight_id },
+    { weight_id: (await params).weight_id },
     { $set: updateFields }
   );
 
