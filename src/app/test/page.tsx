@@ -1,7 +1,7 @@
 "use client"
 
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 export default async function ProtectedPage() {
   const session = await getServerSession(authOptions);
