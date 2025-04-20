@@ -44,10 +44,17 @@ export default function MythicItemsPage() {
       method: "POST",
     })
       .then((res) => res.json())
-      .then((data) => {
+      .then(async (data) => {
         const categorized: Record<string, ItemEntry[]> = {};
 
+        // fetch weight counts
+        const countsRes = await fetch("/api/weights/counts");
+        const weightCounts = await countsRes.json();
+
         for (const [key, item] of Object.entries(data) as [string, Item][]) {
+          const weightCount = weightCounts[item.internalName] ?? 0;
+          (item as any).weightCount = weightCount; // 💡 store count in item
+
           if (item.type === "weapon") {
             const weaponCategory = item.weaponType || "other";
             if (!categorized[weaponCategory]) categorized[weaponCategory] = [];
@@ -88,7 +95,11 @@ export default function MythicItemsPage() {
                     className="border p-2 rounded flex items-center gap-3 text-left hover:bg-muted transition w-full"
                   >
                     <ItemIcon item={item} size={40} />
-                    <strong>{item.internalName}</strong>
+                    <strong>{item.internalName}
+                      {("weightCount" in item) && (
+                        <span className="ml-2 text-xs text-muted-foreground">({(item as any).weightCount})</span>
+                      )}
+                    </strong>
                   </button>
 
                   {selectedItem?.internalName === item.internalName && (
