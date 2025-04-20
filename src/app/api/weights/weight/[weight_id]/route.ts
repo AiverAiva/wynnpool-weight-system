@@ -19,6 +19,7 @@ export async function PATCH(
 
   const updateFields = {
     ...rest,
+    description: data.description || "",
     timestamp: Date.now(),
   };
 

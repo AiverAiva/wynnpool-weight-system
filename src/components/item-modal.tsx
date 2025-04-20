@@ -39,6 +39,7 @@ interface Weight {
   item_id: string;
   weight_name: string;
   weight_id: string;
+  description?: string;
   type: string;
   author: string;
   timestamp: number;
@@ -174,6 +175,9 @@ export default function ItemModal({ item, open, onClose }: Props) {
                             <p className="text-xs text-muted-foreground">
                               {new Date(weight.timestamp).toLocaleString()}
                             </p>
+                            {weight.description && (
+                              <p className="text-sm text-muted-foreground italic mt-1">{weight.description}</p>
+                            )}
                           </div>
 
                         </div>
@@ -299,7 +303,18 @@ export default function ItemModal({ item, open, onClose }: Props) {
                       <Input value={editableWeight.weight_id} disabled readOnly />
                     </div>
                   </div>
-
+                  <div className="w-full">
+                    <Label>Description</Label>
+                    <Input
+                      value={editableWeight.description || ""}
+                      onChange={(e) =>
+                        setEditableWeight({
+                          ...editableWeight,
+                          description: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
                   <div className="space-y-2">
                     <Label>Identifications</Label>
                     <div className="grid grid-cols-2 gap-2">

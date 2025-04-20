@@ -26,6 +26,7 @@ export async function POST(req: Request) {
 
   const newWeight = {
     ...data,
+    description: data.description || "",
     type: "Wynnpool",
     author: "Wynnpool Weight Team",
     timestamp: Date.now(),
