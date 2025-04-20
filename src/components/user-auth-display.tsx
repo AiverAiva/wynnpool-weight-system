@@ -49,7 +49,7 @@ export default function UserAuthDisplay() {
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
                         <div className="p-2">
-                            <span>This is actually making some confusion but the login feature is for only weight team to modify items</span>
+                            <span>This is actually making some confusion but the login feature is only for weight team to modify items</span>
                         </div>
                         {/* <DropdownMenuItem>
                             <User className="mr-2 h-4 w-4" />
