@@ -154,25 +154,46 @@ export default function ItemModal({ item, open, onClose }: Props) {
             ) : (
               <>
                 {weights.length === 0 && <p className="text-sm text-muted-foreground">No weights yet.</p>}
-                {weights.map((weight) => {
-                  const total = Object.values(weight.identifications).reduce((sum, val) => sum + val, 0);
+                <div className="grid grid-cols-2 gap-2">
+                  {weights.map((weight) => {
+                    const total = Object.values(weight.identifications).reduce((sum, val) => sum + val, 0);
 
-                  return (
-                    <div key={weight.weight_id} className="border p-3 rounded-md space-y-1">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="font-medium flex items-center gap-2">
-                            <span className="inline-block px-2 py-0.5 rounded text-xs bg-muted text-muted-foreground">
-                              {weight.type}
-                            </span>
-                            {weight.weight_name}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {weight.author} — {new Date(weight.timestamp).toLocaleString()}
-                          </p>
+                    return (
+                      <div key={weight.weight_id} className="border p-3 rounded-md space-y-1 flex flex-col h-full">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <p className="font-medium flex items-center gap-2">
+                              <span className="inline-block px-2 py-0.5 rounded text-xs bg-muted text-muted-foreground">
+                                {weight.type}
+                              </span>
+                              {weight.weight_name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {weight.author}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(weight.timestamp).toLocaleString()}
+                            </p>
+                          </div>
+
                         </div>
+
+                        {/* Percent breakdown */}
+                        <ul className="text-xs mt-2 grid grid-cols-1 gap-x-6">
+                          {Object.entries(weight.identifications)
+                            .sort(([, a], [, b]) => b - a) // 🔽 Sort descending by value
+                            .map(([key, val]) => (
+                              <li key={key} className="flex justify-between">
+                                <span className="capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
+                                <span>{(val * 100).toFixed(1)}%</span>
+                              </li>
+                            ))}
+                        </ul>
+                        {/* <p className="text-xs text-right mt-1 text-muted-foreground">
+                          Total: {(total * 100).toFixed(1)}%
+                        </p> */}
                         {isAllowed && (
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-grow items-end justify-end gap-2 mt-2">
                             <Button
                               variant="outline"
                               size="sm"
@@ -205,25 +226,10 @@ export default function ItemModal({ item, open, onClose }: Props) {
                         )}
                       </div>
 
-                      {/* Percent breakdown */}
-                      <ul className="text-xs mt-2 grid grid-cols-2 gap-x-6">
-                        {Object.entries(weight.identifications)
-                          .sort(([, a], [, b]) => b - a) // 🔽 Sort descending by value
-                          .map(([key, val]) => (
-                            <li key={key} className="flex justify-between">
-                              <span className="capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
-                              <span>{(val * 100).toFixed(1)}%</span>
-                            </li>
-                          ))}
-                      </ul>
-                      <p className="text-xs text-right mt-1 text-muted-foreground">
-                        Total: {(total * 100).toFixed(1)}%
-                      </p>
-                    </div>
+                    );
 
-                  );
-
-                })}
+                  })}
+                </div>
               </>
             )}
             {/* <h3 className="text-base font-semibold">Item Stats</h3>
