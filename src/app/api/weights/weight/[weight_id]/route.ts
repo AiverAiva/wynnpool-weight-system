@@ -15,8 +15,10 @@ export async function PATCH(
 
   const data = await req.json();
 
+  const { _id, userId, ...rest } = data;
+
   const updateFields = {
-    ...data,
+    ...rest,
     timestamp: Date.now(),
   };
 
