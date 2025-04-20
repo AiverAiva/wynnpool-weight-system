@@ -80,7 +80,7 @@ export default function MythicItemsPage() {
         {Object.entries(groupedItems).map(([category, items]) => (
           <div key={category} className="mt-6">
             <h2 className="text-xl font-semibold capitalize mb-2">{category}</h2>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
               {items.map(([key, item]) => (
                 <div key={key}>
                   <button
