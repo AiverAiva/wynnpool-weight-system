@@ -48,7 +48,10 @@ export default function UserAuthDisplay() {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
-                        <DropdownMenuItem>
+                        <div className="p-2">
+                            <span>This is actually making some confusion but the login feature is for only weight team to modify items</span>
+                        </div>
+                        {/* <DropdownMenuItem>
                             <User className="mr-2 h-4 w-4" />
                             <span>Profile</span>
                         </DropdownMenuItem>
@@ -59,7 +62,7 @@ export default function UserAuthDisplay() {
                         <DropdownMenuItem>
                             <HelpCircle className="mr-2 h-4 w-4" />
                             <span>Help</span>
-                        </DropdownMenuItem>
+                        </DropdownMenuItem> */}
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => signOut()} className="text-red-500">
