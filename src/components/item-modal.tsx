@@ -185,13 +185,13 @@ export default function ItemModal({ item, open, onClose }: Props) {
                   {Object.entries(weight.identifications).map(([key, val]) => (
                     <li key={key} className="flex justify-between">
                       <span className="capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
-                      <span>{(val * 100).toFixed(0)}%</span>
+                      <span>{(val * 100).toFixed(1)}%</span>
                     </li>
                   ))}
                 </ul>
 
                 <p className="text-xs text-right mt-1 text-muted-foreground">
-                  Total: {(total * 100).toFixed(0)}%
+                  Total: {(total * 100).toFixed(1)}%
                 </p>
               </div>
             );
@@ -232,7 +232,7 @@ export default function ItemModal({ item, open, onClose }: Props) {
               const totalPercent = Object.values(editableWeight.identifications).reduce(
                 (sum, val) => sum + (val || 0), 0
               );
-              const isValidTotal = totalPercent <= 1 && totalPercent >= 0.99;
+              const isValidTotal = totalPercent <= 1 && totalPercent >= 0.999;
 
               return (
                 <div className="space-y-3">
@@ -260,32 +260,49 @@ export default function ItemModal({ item, open, onClose }: Props) {
                     <div className="grid grid-cols-2 gap-2">
                       {Object.keys(item.identifications || {})
                         .filter((key) => !STATIC_IDS.includes(key))
-                        .map((key) => (
-                          <div key={key} className="flex items-center gap-2">
-                            <span className="capitalize w-28">{key.replace(/([A-Z])/g, " $1")}</span>
-                            <Input
-                              type="number"
-                              min={0}
-                              max={100}
-                              step={0.01}
-                              className="w-full"
-                              value={
-                                editableWeight.identifications[key] != null
-                                  ? Math.round(editableWeight.identifications[key] * 100)
-                                  : ""
-                              }
-                              onChange={(e) => {
-                                const val = parseInt(e.target.value);
-                                handleChangeWeight(key, isNaN(val) ? 0 : val / 100);
-                              }}
-                            />
-                          </div>
-                        ))}
+                        .map((key) => {
+                          const percent =
+                            editableWeight.identifications[key] != null
+                              ? Number((editableWeight.identifications[key] * 100).toFixed(2))
+                              : "";
+
+                          return (
+                            <div key={key} className="flex items-center gap-2">
+                              <span className="capitalize w-28">
+                                {key.replace(/([A-Z])/g, " $1")}
+                              </span>
+                              <Input
+                                type="number"
+                                min={0}
+                                max={100}
+                                step={0.5}
+                                inputMode="decimal"
+                                className="w-full"
+                                value={percent}
+                                onChange={(e) => {
+                                  const raw = e.target.value;
+
+                                  // Allow empty input to reset
+                                  if (raw === "") {
+                                    handleChangeWeight(key, 0);
+                                    return;
+                                  }
+
+                                  const val = parseFloat(raw);
+                                  if (!isNaN(val)) {
+                                    handleChangeWeight(key, parseFloat((val / 100).toFixed(4)));
+                                  }
+                                }}
+                              />
+                            </div>
+                          );
+                        })}
+
                     </div>
                   </div>
 
                   <p className="text-sm text-muted-foreground text-right mt-1">
-                    Total: {(totalPercent * 100).toFixed(0)}%
+                    Total: {(totalPercent * 100).toFixed(2)}%
                   </p>
                   {!isValidTotal && (
                     <p className="text-sm text-destructive">Total must be 100%</p>
