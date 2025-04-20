@@ -342,9 +342,21 @@ export default function ItemModal({ item, open, onClose }: Props) {
                     </div>
                   </div>
 
+                  <p className="text-sm text-muted-foreground text-right mt-1">
+                    Total: {(Object.values(editableWeight.identifications).reduce(
+                      (sum, val) => sum + (val || 0), 0
+                    ) * 100).toFixed(2)}%
+                  </p>
                   <div className="flex justify-end gap-2 mt-4">
                     <Button variant="secondary" onClick={() => setEditableWeight(null)}>Cancel</Button>
-                    <Button disabled={(Object.values(editableWeight.identifications).reduce((sum, val) => sum + (val || 0), 0) * 100) !== 100} onClick={handleSubmit}>Save</Button>
+                    <Button disabled={
+                      Number(
+                        (
+                          Object.values(editableWeight.identifications)
+                            .reduce((sum, val) => sum + (val || 0), 0) * 100
+                        ).toFixed(2)
+                      ) !== 100
+                    } onClick={handleSubmit}>Save</Button>
                   </div>
                 </div>
               </div>
