@@ -80,8 +80,8 @@ export default function MythicItemsPage() {
     <div className="min-h-screen bg-background">
       <div className="mt-[80px]" />
       <main className="container mx-auto p-6 max-w-screen-lg duration-150">
-        <h1 className="text-2xl font-bold">If you are having any question/idea with the weight</h1>
-        <h1 className="text-2xl font-bold">Please join <Link className="text-2xl font-bold cursor-pointer text-blue-500 hover:text-blue-700 transition-color duration-150" href='https://discord.gg/QZn4Qk3mSP'>https://discord.gg/QZn4Qk3mSP</Link></h1>
+        <h1 className="text-3xl font-bold">If you have any questions about the weighting systems</h1>
+        <h1 className="text-3xl font-bold">I encourage you to ask at: <Link className="font-bold cursor-pointer text-blue-500 hover:text-blue-700 transition-color duration-150" href='https://discord.gg/QZn4Qk3mSP'>Wynnpool Discord</Link></h1>
         {/* <h1 className="text-2xl font-bold">Mythic Items</h1> */}
 
         {Object.entries(groupedItems).map(([category, items]) => (
