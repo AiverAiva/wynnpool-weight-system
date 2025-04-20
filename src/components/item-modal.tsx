@@ -101,8 +101,14 @@ export default function ItemModal({ item, open, onClose }: Props) {
   const handleSubmit = async () => {
     if (!editableWeight || !session?.user?.id) return;
 
+    // 🔍 Filter identifications that are not zero
+    const filteredIdentifications = Object.fromEntries(
+      Object.entries(editableWeight.identifications).filter(([, val]) => val > 0)
+    );
+
     const payload = {
       ...editableWeight,
+      identifications: filteredIdentifications, // ✅ use filtered
       userId: session.user.id,
     };
 
