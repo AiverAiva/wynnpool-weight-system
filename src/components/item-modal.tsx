@@ -70,9 +70,8 @@ export default function ItemModal({ item, open, onClose }: Props) {
     fetch(`/api/weights/item/${item.internalName}`)
       .then((res) => res.json())
       .then((data) => setWeights(data))
-      .catch(console.error)
+      .catch(console.error);
   }, [item]);
-
 
   useEffect(() => {
     const checkPermission = async () => {
@@ -134,107 +133,137 @@ export default function ItemModal({ item, open, onClose }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className={editableWeight ? `sm:max-w-screen-lg` : `sm:max-w-lg`}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <ItemIcon item={item} size={40} />
             {item.internalName}
           </DialogTitle>
-          <DialogDescription className="capitalize">
-            {item.type}
-          </DialogDescription>
+          <DialogDescription className="capitalize">{item.type}</DialogDescription>
         </DialogHeader>
 
-        {/* Public Weights */}
-        <div className="mt-4 space-y-2">
-          <h3 className="text-base font-semibold">Existing Weights</h3>
-          {weights.length === 0 && <p className="text-sm text-muted-foreground">No weights yet.</p>}
-          {weights.map((weight) => {
-            const total = Object.values(weight.identifications).reduce((sum, val) => sum + val, 0);
-
-            return (
-              <div
-                key={weight.weight_id}
-                className="border p-3 rounded-md space-y-1"
-              >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium flex items-center gap-2">
-                      <span className="inline-block px-2 py-0.5 rounded text-xs bg-muted text-muted-foreground">
-                        {weight.type}
-                      </span>
-                      {weight.weight_name}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {weight.author} — {new Date(weight.timestamp).toLocaleString()}
-                    </p>
-                  </div>
-                  {isAllowed && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setEditableWeight(weight)}
-                    >
-                      Edit
-                    </Button>
-                  )}
-                </div>
-
-                {/* Percent breakdown */}
-                <ul className="text-xs mt-2 grid grid-cols-2 gap-x-6">
-                  {Object.entries(weight.identifications).map(([key, val]) => (
-                    <li key={key} className="flex justify-between">
-                      <span className="capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
-                      <span>{(val * 100).toFixed(1)}%</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <p className="text-xs text-right mt-1 text-muted-foreground">
-                  Total: {(total * 100).toFixed(1)}%
-                </p>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Editable Form */}
-        {isAllowed && (
-          <div className="mt-6 border-t pt-4 space-y-3">
-            <h3 className="text-base font-semibold">
-              {editableWeight ? "Edit Weight" : "Create New Weight"}
-            </h3>
-
-            {/* New weight creator */}
-            {!editableWeight && (
-              <Button
-                variant="default"
-                size="sm"
-                onClick={() =>
-                  setEditableWeight({
-                    item_name: item.internalName,
-                    item_id: item.internalName,
-                    weight_name: "",
-                    weight_id: generateWeightId(item.internalName), // auto-generated!
-                    type: "Wynnpool",
-                    author: "Wynnpool Weight Team",
-                    timestamp: Date.now(),
-                    identifications: {},
-                  })
-                }
-              >
-                + Add Weight
-              </Button>
-            )}
-
-            {/* Form */}
-            {editableWeight && (() => {
-              const totalPercent = Object.values(editableWeight.identifications).reduce(
-                (sum, val) => sum + (val || 0), 0
-              );
-              const isValidTotal = totalPercent <= 1 && totalPercent >= 0.999;
+        <div className="flex space-x-6">
+          {/* Left Column: Item Stats */}
+          <div className="flex-1 overflow-y-auto max-h-[60vh] space-y-2">
+            <h3 className="text-base font-semibold">Weights</h3>
+            {weights.length === 0 && <p className="text-sm text-muted-foreground">No weights yet.</p>}
+            {weights.map((weight) => {
+              const total = Object.values(weight.identifications).reduce((sum, val) => sum + val, 0);
 
               return (
+                <div key={weight.weight_id} className="border p-3 rounded-md space-y-1">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium flex items-center gap-2">
+                        <span className="inline-block px-2 py-0.5 rounded text-xs bg-muted text-muted-foreground">
+                          {weight.type}
+                        </span>
+                        {weight.weight_name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {weight.author} — {new Date(weight.timestamp).toLocaleString()}
+                      </p>
+                    </div>
+                    {isAllowed && (
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setEditableWeight(weight)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={async () => {
+                            const confirmDelete = confirm(`Are you sure you want to delete "${weight.weight_name}"?`);
+                            if (!confirmDelete) return;
+
+                            const res = await fetch(`/api/weights/weight/${weight.weight_id}`, {
+                              method: "DELETE",
+                            });
+
+                            if (res.ok) {
+                              const updated = await fetch(`/api/weights/item/${item.internalName}`).then((r) => r.json());
+                              setWeights(updated);
+                            } else {
+                              alert("Failed to delete weight.");
+                            }
+                          }}
+                        >
+                          🗑
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Percent breakdown */}
+                  <ul className="text-xs mt-2 grid grid-cols-2 gap-x-6">
+                    {Object.entries(weight.identifications).map(([key, val]) => (
+                      <li key={key} className="flex justify-between">
+                        <span className="capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
+                        <span>{(val * 100).toFixed(1)}%</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <p className="text-xs text-right mt-1 text-muted-foreground">
+                    Total: {(total * 100).toFixed(1)}%
+                  </p>
+                </div>
+
+              );
+
+            })}
+            {/* <h3 className="text-base font-semibold">Item Stats</h3>
+            {Object.entries(item.identifications || {}).map(([key, value]) => (
+              <div key={key} className="mt-2">
+                <p className="capitalize">{key.replace(/([A-Z])/g, " $1")}</p>
+                <p>{typeof value === "object" ? `${value.min} - ${value.max}` : value}</p>
+              </div>
+            ))} */}
+            {isAllowed && (
+              <div className="mt-6 border-t pt-4 space-y-3">
+                {/* <h3 className="text-base font-semibold">
+                  {editableWeight ? "Edit Weight" : "Create New Weight"}
+                </h3> */}
+                {/* Right Column: Weights & Editing */}
+
+                {/* New weight creator */}
+                {!editableWeight && (
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() =>
+                      setEditableWeight({
+                        item_name: item.internalName,
+                        item_id: item.internalName,
+                        weight_name: "",
+                        weight_id: generateWeightId(item.internalName), // auto-generated!
+                        type: "Wynnpool",
+                        author: "Wynnpool Weight Team",
+                        timestamp: Date.now(),
+                        identifications: {},
+                      })
+                    }
+                  >
+                    + Add Weight
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Right Column: Weights & Editing */}
+
+
+          {/* Editable Weight */}
+          {isAllowed && editableWeight && (
+            <div className="flex-1 overflow-y-auto max-h-[60vh]">
+              <div className="mt-6 space-y-3">
+                <h3 className="text-base font-semibold">Edit Weight</h3>
+
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-2">
                     <div>
@@ -268,9 +297,7 @@ export default function ItemModal({ item, open, onClose }: Props) {
 
                           return (
                             <div key={key} className="flex items-center gap-2">
-                              <span className="capitalize w-28">
-                                {key.replace(/([A-Z])/g, " $1")}
-                              </span>
+                              <span className="text-xs capitalize w-28">{key.replace(/([A-Z])/g, " $1")}</span>
                               <Input
                                 type="number"
                                 min={0}
@@ -282,7 +309,6 @@ export default function ItemModal({ item, open, onClose }: Props) {
                                 onChange={(e) => {
                                   const raw = e.target.value;
 
-                                  // Allow empty input to reset
                                   if (raw === "") {
                                     handleChangeWeight(key, 0);
                                     return;
@@ -297,27 +323,19 @@ export default function ItemModal({ item, open, onClose }: Props) {
                             </div>
                           );
                         })}
-
                     </div>
                   </div>
 
-                  <p className="text-sm text-muted-foreground text-right mt-1">
-                    Total: {(totalPercent * 100).toFixed(2)}%
-                  </p>
-                  {!isValidTotal && (
-                    <p className="text-sm text-destructive">Total must be 100%</p>
-                  )}
-
                   <div className="flex justify-end gap-2 mt-4">
                     <Button variant="secondary" onClick={() => setEditableWeight(null)}>Cancel</Button>
-                    <Button disabled={!isValidTotal} onClick={handleSubmit}>Save</Button>
+                    <Button disabled={(Object.values(editableWeight.identifications).reduce((sum, val) => sum + (val || 0), 0) * 100) !== 100} onClick={handleSubmit}>Save</Button>
                   </div>
                 </div>
-              );
-            })()}
-          </div>
-        )}
+              </div>
+            </div>
+          )}
+        </div>
       </DialogContent>
-    </Dialog >
+    </Dialog>
   );
 }
