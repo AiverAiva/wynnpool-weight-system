@@ -207,14 +207,15 @@ export default function ItemModal({ item, open, onClose }: Props) {
 
                       {/* Percent breakdown */}
                       <ul className="text-xs mt-2 grid grid-cols-2 gap-x-6">
-                        {Object.entries(weight.identifications).map(([key, val]) => (
-                          <li key={key} className="flex justify-between">
-                            <span className="capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
-                            <span>{(val * 100).toFixed(1)}%</span>
-                          </li>
-                        ))}
+                        {Object.entries(weight.identifications)
+                          .sort(([, a], [, b]) => b - a) // 🔽 Sort descending by value
+                          .map(([key, val]) => (
+                            <li key={key} className="flex justify-between">
+                              <span className="capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
+                              <span>{(val * 100).toFixed(1)}%</span>
+                            </li>
+                          ))}
                       </ul>
-
                       <p className="text-xs text-right mt-1 text-muted-foreground">
                         Total: {(total * 100).toFixed(1)}%
                       </p>
