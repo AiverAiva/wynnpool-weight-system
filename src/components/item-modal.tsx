@@ -64,13 +64,16 @@ export default function ItemModal({ item, open, onClose }: Props) {
   const [weights, setWeights] = useState<Weight[]>([]);
   const [editableWeight, setEditableWeight] = useState<Weight | null>(null);
   const [isAllowed, setIsAllowed] = useState(false);
+  const [isLoadingWeight, setIsLoadingWeight] = useState(false);
 
   useEffect(() => {
     if (!item?.internalName) return;
+    setIsLoadingWeight(true); // start loading
     fetch(`/api/weights/item/${item.internalName}`)
       .then((res) => res.json())
       .then((data) => setWeights(data))
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setIsLoadingWeight(false)); // stop loading
   }, [item]);
 
   useEffect(() => {
@@ -146,76 +149,82 @@ export default function ItemModal({ item, open, onClose }: Props) {
           {/* Left Column: Item Stats */}
           <div className="flex-1 overflow-y-auto max-h-[60vh] space-y-2">
             <h3 className="text-base font-semibold">Weights</h3>
-            {weights.length === 0 && <p className="text-sm text-muted-foreground">No weights yet.</p>}
-            {weights.map((weight) => {
-              const total = Object.values(weight.identifications).reduce((sum, val) => sum + val, 0);
+            {isLoadingWeight ? (
+              <WeightSkeleton />
+            ) : (
+              <>
+                {weights.length === 0 && <p className="text-sm text-muted-foreground">No weights yet.</p>}
+                {weights.map((weight) => {
+                  const total = Object.values(weight.identifications).reduce((sum, val) => sum + val, 0);
 
-              return (
-                <div key={weight.weight_id} className="border p-3 rounded-md space-y-1">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="font-medium flex items-center gap-2">
-                        <span className="inline-block px-2 py-0.5 rounded text-xs bg-muted text-muted-foreground">
-                          {weight.type}
-                        </span>
-                        {weight.weight_name}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {weight.author} — {new Date(weight.timestamp).toLocaleString()}
+                  return (
+                    <div key={weight.weight_id} className="border p-3 rounded-md space-y-1">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="font-medium flex items-center gap-2">
+                            <span className="inline-block px-2 py-0.5 rounded text-xs bg-muted text-muted-foreground">
+                              {weight.type}
+                            </span>
+                            {weight.weight_name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {weight.author} — {new Date(weight.timestamp).toLocaleString()}
+                          </p>
+                        </div>
+                        {isAllowed && (
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditableWeight(weight)}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={async () => {
+                                const confirmDelete = confirm(`Are you sure you want to delete "${weight.weight_name}"?`);
+                                if (!confirmDelete) return;
+
+                                const res = await fetch(`/api/weights/weight/${weight.weight_id}`, {
+                                  method: "DELETE",
+                                });
+
+                                if (res.ok) {
+                                  const updated = await fetch(`/api/weights/item/${item.internalName}`).then((r) => r.json());
+                                  setWeights(updated);
+                                } else {
+                                  alert("Failed to delete weight.");
+                                }
+                              }}
+                            >
+                              🗑
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Percent breakdown */}
+                      <ul className="text-xs mt-2 grid grid-cols-2 gap-x-6">
+                        {Object.entries(weight.identifications).map(([key, val]) => (
+                          <li key={key} className="flex justify-between">
+                            <span className="capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
+                            <span>{(val * 100).toFixed(1)}%</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      <p className="text-xs text-right mt-1 text-muted-foreground">
+                        Total: {(total * 100).toFixed(1)}%
                       </p>
                     </div>
-                    {isAllowed && (
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setEditableWeight(weight)}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={async () => {
-                            const confirmDelete = confirm(`Are you sure you want to delete "${weight.weight_name}"?`);
-                            if (!confirmDelete) return;
 
-                            const res = await fetch(`/api/weights/weight/${weight.weight_id}`, {
-                              method: "DELETE",
-                            });
+                  );
 
-                            if (res.ok) {
-                              const updated = await fetch(`/api/weights/item/${item.internalName}`).then((r) => r.json());
-                              setWeights(updated);
-                            } else {
-                              alert("Failed to delete weight.");
-                            }
-                          }}
-                        >
-                          🗑
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Percent breakdown */}
-                  <ul className="text-xs mt-2 grid grid-cols-2 gap-x-6">
-                    {Object.entries(weight.identifications).map(([key, val]) => (
-                      <li key={key} className="flex justify-between">
-                        <span className="capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
-                        <span>{(val * 100).toFixed(1)}%</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <p className="text-xs text-right mt-1 text-muted-foreground">
-                    Total: {(total * 100).toFixed(1)}%
-                  </p>
-                </div>
-
-              );
-
-            })}
+                })}
+              </>
+            )}
             {/* <h3 className="text-base font-semibold">Item Stats</h3>
             {Object.entries(item.identifications || {}).map(([key, value]) => (
               <div key={key} className="mt-2">
@@ -337,5 +346,25 @@ export default function ItemModal({ item, open, onClose }: Props) {
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function WeightSkeleton() {
+  return (
+    <div className="border p-3 rounded-md space-y-2 animate-pulse">
+      <div className="flex justify-between items-center">
+        <div className="space-y-1">
+          <div className="h-4 w-32 bg-muted rounded" />
+          <div className="h-3 w-40 bg-muted rounded" />
+        </div>
+        <div className="h-6 w-16 bg-muted rounded" />
+      </div>
+      <div className="grid grid-cols-2 gap-x-6 mt-2">
+        <div className="h-3 w-24 bg-muted rounded" />
+        <div className="h-3 w-16 bg-muted rounded" />
+        <div className="h-3 w-24 bg-muted rounded" />
+        <div className="h-3 w-16 bg-muted rounded" />
+      </div>
+    </div>
   );
 }
