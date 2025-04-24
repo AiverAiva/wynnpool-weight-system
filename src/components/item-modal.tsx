@@ -152,7 +152,7 @@ export default function ItemModal({ item, open, onClose }: Props) {
           <DialogDescription className="capitalize">{item.type}</DialogDescription>
         </DialogHeader>
 
-        <div className="flex space-x-6">
+        <div className="md:flex space-x-6">
           {/* Left Column: Item Stats */}
           <div className="flex-1 overflow-y-auto max-h-[60vh] space-y-2">
             <h3 className="text-base font-semibold">Weights</h3>
