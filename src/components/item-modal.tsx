@@ -66,6 +66,7 @@ export default function ItemModal({ item, open, onClose }: Props) {
   const [editableWeight, setEditableWeight] = useState<Weight | null>(null);
   const [isAllowed, setIsAllowed] = useState(false);
   const [isLoadingWeight, setIsLoadingWeight] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!item?.internalName) return;
@@ -100,7 +101,7 @@ export default function ItemModal({ item, open, onClose }: Props) {
 
   const handleSubmit = async () => {
     if (!editableWeight || !session?.user?.id) return;
-
+    setSubmitting(true);
     // 🔍 Filter identifications that are not zero
     const filteredIdentifications = Object.fromEntries(
       Object.entries(editableWeight.identifications).filter(([, val]) => val > 0)
@@ -134,6 +135,7 @@ export default function ItemModal({ item, open, onClose }: Props) {
     } else {
       console.error("Failed to save weight");
     }
+    setSubmitting(false);
   };
 
   const generateWeightId = (itemName: string) => {
@@ -370,14 +372,14 @@ export default function ItemModal({ item, open, onClose }: Props) {
                   </p>
                   <div className="flex justify-end gap-2 mt-4">
                     <Button variant="secondary" onClick={() => setEditableWeight(null)}>Cancel</Button>
-                    <Button disabled={
+                    <Button disabled={submitting ||
                       Number(
                         (
                           Object.values(editableWeight.identifications)
                             .reduce((sum, val) => sum + (val || 0), 0) * 100
                         ).toFixed(2)
                       ) !== 100
-                    } onClick={handleSubmit}>Save</Button>
+                    } onClick={handleSubmit}>{submitting ? "Saving..." : "Save Weight"}</Button>
                   </div>
                 </div>
               </div>
