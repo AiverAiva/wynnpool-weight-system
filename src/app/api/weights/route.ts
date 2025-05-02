@@ -18,8 +18,8 @@ export async function POST(req: NextRequest) {
         return new Response(JSON.stringify({ error: "Missing fields" }), { status: 400 });
     }
 
-    const collection = await connectToDB();
-    const existing = await collection.findOne({ weight_id: data.weight_id });
+    const { weightData } = await connectToDB();
+    const existing = await weightData.findOne({ weight_id: data.weight_id });
 
     if (existing) {
         return new Response(JSON.stringify({ error: "Weight already exists" }), { status: 409 });
@@ -44,6 +44,6 @@ export async function POST(req: NextRequest) {
             Object.entries(newWeight.identifications).map(([k, v]) => [k, { new: v as number }])
         ),
     });
-    await collection.insertOne(newWeight);
+    await weightData.insertOne(newWeight);
     return new Response(JSON.stringify({ success: true }), { status: 201 });
 }

@@ -26,15 +26,15 @@ export async function PATCH(
     timestamp: Date.now(),
   };
 
-  const collection = await connectToDB();
+  const { weightData } = await connectToDB();
 
   // Get the existing weight before updating
-  const existing = await collection.findOne({ weight_id });
+  const existing = await weightData.findOne({ weight_id });
   if (!existing) {
     return new Response(JSON.stringify({ error: "Weight not found" }), { status: 404 });
   }
 
-  const result = await collection.updateOne(
+  const result = await weightData.updateOne(
     { weight_id },
     { $set: updateFields }
   );
@@ -81,15 +81,15 @@ export async function DELETE(
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 403 });
   }
 
-  const collection = await connectToDB();
+  const { weightData } = await connectToDB();
 
   // Get the document before deletion
-  const existing = await collection.findOne({ weight_id });
+  const existing = await weightData.findOne({ weight_id });
   if (!existing) {
     return new Response(JSON.stringify({ error: "Weight not found" }), { status: 404 });
   }
 
-  const result = await collection.deleteOne({ weight_id });
+  const result = await weightData.deleteOne({ weight_id });
 
   if (result.deletedCount === 0) {
     return new Response(JSON.stringify({ error: "Deletion failed" }), { status: 500 });

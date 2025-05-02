@@ -28,5 +28,9 @@ if (process.env.NODE_ENV === "development") {
 
 export const connectToDB = async () => {
   const connectedClient = await clientPromise;
-  return connectedClient.db("wynnpool").collection("weight_data");
+  const db = connectedClient.db("wynnpool")
+  return {
+    weightData: db.collection("weight_data"),
+    verifiedItems: db.collection("verified_item_data"),
+  };
 };
