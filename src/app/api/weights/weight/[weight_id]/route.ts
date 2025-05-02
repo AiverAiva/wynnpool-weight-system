@@ -2,16 +2,18 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { connectToDB } from "@/lib/mongodb";
 import { sendToWebhook } from "@/lib/send-to-webhook";
+import { getToken } from "next-auth/jwt";
+import { NextRequest } from "next/server";
 
 export async function PATCH(
-  req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ weight_id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const allowedIds = process.env.ALLOWED_IDS?.split(",") ?? [];
   const { weight_id } = await params;
 
-  if (!session?.user?.id || !allowedIds.includes(session.user.id)) {
+  if (!token?.sub || !allowedIds.includes(token.sub)) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 403 });
   }
 
@@ -56,7 +58,7 @@ export async function PATCH(
   // Send webhook
   await sendToWebhook({
     action: "updated",
-    author: session.user.name || session.user.id,
+    author: token.name || token.sub,
     item_id: updateFields.item_id,
     weight_name: updateFields.weight_name,
     weight_id,
@@ -68,14 +70,14 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ weight_id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const allowedIds = process.env.ALLOWED_IDS?.split(",") ?? [];
   const { weight_id } = await params;
 
-  if (!session?.user?.id || !allowedIds.includes(session.user.id)) {
+  if (!token?.sub || !allowedIds.includes(token.sub)) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 403 });
   }
 
@@ -96,7 +98,7 @@ export async function DELETE(
   // Send webhook with full identifications
   await sendToWebhook({
     action: "deleted",
-    author: session.user.name || session.user.id,
+    author: token.name || token.sub,
     item_id: existing.item_id,
     weight_name: existing.weight_name,
     weight_id,

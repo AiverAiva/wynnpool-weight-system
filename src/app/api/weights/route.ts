@@ -1,13 +1,13 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { connectToDB } from "@/lib/mongodb";
 import { sendToWebhook } from "@/lib/send-to-webhook";
+import { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-export async function POST(req: Request) {
-    const session = await getServerSession(authOptions);
+export async function POST(req: NextRequest) {
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
     const allowedIds = process.env.ALLOWED_IDS?.split(",") ?? [];
 
-    if (!session?.user?.id || !allowedIds.includes(session.user.id)) {
+    if (!token?.sub || !allowedIds.includes(token.sub)) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 403 });
     }
 
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
     await sendToWebhook({
         action: "created",
-        author: session.user.name || session.user.id,
+        author: token.name || token.sub,
         item_id: newWeight.item_id,
         weight_name: newWeight.weight_name,
         weight_id: newWeight.weight_id,
