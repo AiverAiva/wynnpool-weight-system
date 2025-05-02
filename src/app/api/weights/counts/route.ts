@@ -1,9 +1,9 @@
 import { connectToDB } from "@/lib/mongodb";
 
 export async function GET() {
-  const collection = await connectToDB();
+  const { weightData } = await connectToDB();
 
-  const results = await collection
+  const results = await weightData
     .aggregate([
       { $group: { _id: "$item_id", count: { $sum: 1 } } },
     ])
