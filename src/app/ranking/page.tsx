@@ -26,6 +26,8 @@ interface Item {
   identifications?: Record<string, number | IdentificationValue>;
 }
 
+type ItemEntry = [string, any];
+
 export default function RankingPage() {
   const [groupedItems, setGroupedItems] = useState<Record<string, [string, Item][]>>({});
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
@@ -44,12 +46,17 @@ export default function RankingPage() {
     fetch("/api/items/search", { method: "POST" })
       .then((res) => res.json())
       .then((data) => {
-        const categorized: Record<string, [string, Item][]> = {};
+        const categorized: Record<string, ItemEntry[]> = {};
+
+
         for (const [key, item] of Object.entries(data) as [string, Item][]) {
           if (item.type === "weapon") {
-            const category = item.weaponType || "other";
-            if (!categorized[category]) categorized[category] = [];
-            categorized[category].push([key, item]);
+            const weaponCategory = item.weaponType || "other";
+            if (!categorized[weaponCategory]) categorized[weaponCategory] = [];
+            categorized[weaponCategory].push([key, item]);
+          } else if (item.type === "armour") {
+            if (!categorized["armour"]) categorized["armour"] = [];
+            categorized["armour"].push([key, item]);
           }
         }
         setGroupedItems(categorized);
