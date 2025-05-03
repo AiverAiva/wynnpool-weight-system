@@ -17,6 +17,11 @@ interface VerifiedItem {
   timestamp: number;
   originalString: string;
   identifications: Record<string, number>;
+  shinyStat?: {                   // ← new optional field
+    key: string;
+    displayName: string;
+    value: number;
+  };
 }
 
 interface Weight {
@@ -167,9 +172,11 @@ export default function ItemWeightedLB({ item, open, onClose }: { item: Item; op
                                   <strong>#{i + 1}</strong> {entry.owner}
                                 </span>
                               </div>
-                              <span className="font-mono">
-                                {(entry.score * 100).toFixed(2)}%
-                              </span>
+                              <div>
+                                {/* ✦ if shiny */}
+                                {entry.shinyStat && <span className="text-yellow-300 mr-2">✦</span>}
+                                <span className="font-mono">{(entry.score * 100).toFixed(2)}%</span>
+                              </div>
                             </div>
                           </PopoverTrigger>
                           <PopoverContent className="w-fit">
