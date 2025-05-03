@@ -86,7 +86,7 @@ export default function ItemWeightedLB({ item, open, onClose }: { item: Item; op
     return (
       <Dialog open={open} onOpenChange={onClose}>
         <DialogContent>
-          <p className="text-center">Loading data...</p>
+          <DialogTitle><p className="text-center">Loading data...</p></DialogTitle>
         </DialogContent>
       </Dialog>
     );
@@ -107,8 +107,8 @@ export default function ItemWeightedLB({ item, open, onClose }: { item: Item; op
               {weights.map((w) => (
                 <TabsTrigger key={w.weight_id} value={w.weight_id}>
                   <Popover>
-                    <PopoverTrigger>
-                      {w.weight_name}
+                    <PopoverTrigger asChild>
+                      <span>{w.weight_name}</span>
                     </PopoverTrigger>
                     <PopoverContent className="w-80">
                       <h4 className="font-medium mb-1">Weight Info</h4>
@@ -125,6 +125,7 @@ export default function ItemWeightedLB({ item, open, onClose }: { item: Item; op
                 </TabsTrigger>
               ))}
             </TabsList>
+
             {weights.map((weight) => {
               const ranked = [...verifiedItems]
                 .map((v) => ({ ...v, score: calculateScore(v, weight) }))
@@ -151,7 +152,7 @@ export default function ItemWeightedLB({ item, open, onClose }: { item: Item; op
                             </div>
                           </PopoverTrigger>
                           <PopoverContent className="w-fit">
-                            {/* @ts-ignore */}  
+                            {/* @ts-ignore */}
                             <RolledItemDisplay data={demoData} />
 
                           </PopoverContent>
