@@ -5,7 +5,7 @@ import Image from "next/image";
 import { FC } from "react";
 import { cn } from "@/lib/utils"; // or just remove if not using className combiner
 
-interface Item {
+export interface Item {
   internalName: string;
   type: string;
   armourType?: string;

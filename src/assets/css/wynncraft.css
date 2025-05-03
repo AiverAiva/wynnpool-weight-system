@@ -1,0 +1,105 @@
+@font-face {
+    font-family: 'five';
+    src: url('/fonts/five.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+.font-five {
+    font-family: 'five';
+}
+
+@font-face {
+    font-family: 'common';
+    src: url('/fonts/common.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+.font-common {
+    font-family: 'common';
+}
+
+
+@font-face {
+    font-family: 'ascii';
+    src: url('/fonts/ascii.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+.font-ascii {
+    font-family: 'ascii';
+}
+
+@font-face {
+    font-family: 'wynnic';
+    src: url('/fonts/wynnic.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+.font-wynnic {
+    font-family: 'wynnic';
+}
+
+.text-common {
+    color: #e2e8f0;
+}
+
+.text-set {
+    color: #55ff55;
+}
+
+.text-unique {
+    color: #ffff55;
+}
+
+.text-rare {
+    color: #ff55ff;
+}
+
+.text-legendary {
+    color: #55ffff;
+}
+
+.text-fabled {
+    color: #ff5555;
+}
+
+.text-mythic {
+    color: #aa00aa;
+}
+
+/* Background Colors */
+.bg-common {
+    background-color: #e2e8f0;
+}
+
+.bg-set {
+    background-color: #55ff55;
+}
+
+.bg-unique {
+    background-color: #ffff55;
+}
+
+.bg-rare {
+    background-color: #ff55ff;
+}
+
+.bg-legendary {
+    background-color: #55ffff;
+}
+
+.bg-fabled {
+    background-color: #ff5555;
+}
+
+.bg-mythic {
+    background-color: #aa00aa;
+}
