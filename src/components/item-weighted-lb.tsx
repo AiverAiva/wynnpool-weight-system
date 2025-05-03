@@ -145,9 +145,12 @@ export default function ItemWeightedLB({ item, open, onClose }: { item: Item; op
                         <Popover key={entry.originalString}>
                           <PopoverTrigger asChild>
                             <div className="border rounded p-2 text-sm flex justify-between items-center cursor-pointer">
-                              <span>
-                                <strong>#{i + 1}</strong> {entry.owner}
-                              </span>
+                              <div className="flex space-x-2 items-center text-md">
+                                <img src={`https://www.mc-heads.net/avatar/${entry.owner}`} alt={entry.owner} className="w-6 h-6" />
+                                <span>
+                                  <strong>#{i + 1}</strong> {entry.owner}
+                                </span>
+                              </div>
                               <span className="font-mono">{(entry.score * 100).toFixed(2)}%</span>
                             </div>
                           </PopoverTrigger>
