@@ -90,17 +90,14 @@ export default function MythicItemsPage() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
               {items.map(([key, item]) => (
                 <div key={key}>
-                  <button
+                  <div
                     onClick={() => setSelectedItem(item)}
-                    className="border p-2 rounded flex items-center gap-3 text-left hover:bg-muted transition w-full"
+                    role="button"
+                    className="border p-2 rounded flex items-center gap-3 text-left hover:bg-muted transition w-full cursor-pointer"
                   >
                     <ItemIcon item={item} size={40} />
-                    <strong>{item.internalName}
-                      {("weightCount" in item) && (
-                        <span className="ml-2 text-xs text-muted-foreground">({(item as any).weightCount})</span>
-                      )}
-                    </strong>
-                  </button>
+                    <strong>{item.internalName}</strong>
+                  </div>
 
                   {selectedItem?.internalName === item.internalName && (
                     <ItemModal item={item} open={true} onClose={() => setSelectedItem(null)} />
