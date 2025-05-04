@@ -52,7 +52,7 @@ export default function ItemWeightedLB({ item, open, onClose }: { item: Item; op
       .then(setWeights)
       .catch(console.error);
 
-    fetch("/api/verified-items")
+    fetch(`/api/verified-items?itemName=${item.internalName}`)
       .then((res) => res.json())
       .then((data) => {
         setVerifiedItems(data.filter((e: VerifiedItem) => e.itemName === item.internalName));
@@ -67,6 +67,7 @@ export default function ItemWeightedLB({ item, open, onClose }: { item: Item; op
       })
       .catch(console.error)
       .finally(() => setLoading(false));
+
   }, [item]);
 
   function calculateScore(entry: VerifiedItem, weight?: Weight): number {

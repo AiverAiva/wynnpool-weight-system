@@ -1,12 +1,17 @@
 import { connectToDB } from "@/lib/mongodb";
 
-export async function GET() {
-    const { verifiedItems } = await connectToDB()
-    const db = await verifiedItems
-    const items = await db.find().sort({ timestamp: -1 }).limit(100).toArray();
+export async function GET(req: Request) {
+    const { searchParams } = new URL(req.url);
+    const itemName = searchParams.get("itemName");
+
+    const { verifiedItems } = await connectToDB();
+    const db = await verifiedItems;
+
+    const query = itemName ? { itemName } : {};
+    const items = await db.find(query).sort({ timestamp: -1 }).toArray(); // remove `.limit(100)` if filtering by item
+
     return new Response(JSON.stringify(items), { status: 200 });
 }
-
 export async function POST(req: Request) {
     const { verifiedItems } = await connectToDB()
     const db = await verifiedItems
