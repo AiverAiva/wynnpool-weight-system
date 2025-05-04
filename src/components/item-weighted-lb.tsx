@@ -116,7 +116,7 @@ export default function ItemWeightedLB({ item, open, onClose }: { item: Item; op
           <p className="text-muted-foreground text-sm">No weight data available.</p>
         ) : (
           <Tabs defaultValue={tabs[0].weight_id} className="w-full">
-            <TabsList className="flex flex-wrap gap-2">
+            <TabsList className="flex flex-wrap">
               {tabs.map(tab => {
                 const weightObj = weights.find(w => w.weight_id === tab.weight_id);
                 return (
