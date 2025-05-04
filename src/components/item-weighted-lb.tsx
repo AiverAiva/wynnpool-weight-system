@@ -152,7 +152,8 @@ export default function ItemWeightedLB({ item, open, onClose }: { item: Item; op
               // rank entries
               const ranked = verifiedItems
                 .map(v => ({ ...v, score: calculateScore(v, weightObj) }))
-                .sort((a, b) => b.score - a.score);
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 10);
 
               return (
                 <TabsContent key={tab.weight_id} value={tab.weight_id}>
@@ -183,7 +184,6 @@ export default function ItemWeightedLB({ item, open, onClose }: { item: Item; op
                           <PopoverContent className="w-fit">
                             {/* @ts-ignore */}
                             <RolledItemDisplay data={demoData} />
-
                           </PopoverContent>
                         </Popover>
                       );
