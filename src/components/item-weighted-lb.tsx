@@ -8,6 +8,7 @@ import { calculateIdentificationRoll } from "@/lib/identification-utils";
 import { RolledItemDisplay } from "./item/RolledItemDisplay";
 import { CombatItem } from "@/types/itemType";
 import { getRollPercentageString } from "@/lib/itemUtils";
+import { ArrowDownWideNarrow, ArrowUpNarrowWide } from "lucide-react";
 
 interface Item { internalName: string; }
 
@@ -22,6 +23,7 @@ interface VerifiedItem {
     displayName: string;
     value: number;
   };
+  ironman?: boolean;
 }
 
 interface Weight {
@@ -42,6 +44,8 @@ export default function ItemWeightedLB({ item, open, onClose }: { item: Item; op
   const [idRanges, setIdRanges] = useState<Record<string, IdentificationRange>>({});
   const [selectedItem, setSelectedItem] = useState<CombatItem>();
   const [loading, setLoading] = useState(true);
+  const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
+  const [shinyOnly, setShinyOnly] = useState(false);
 
   useEffect(() => {
     if (!item.internalName) return;
@@ -117,33 +121,54 @@ export default function ItemWeightedLB({ item, open, onClose }: { item: Item; op
           <p className="text-muted-foreground text-sm">No weight data available.</p>
         ) : (
           <Tabs defaultValue={tabs[0].weight_id} className="w-full">
-            <TabsList className="flex flex-wrap">
-              {tabs.map(tab => {
-                const weightObj = weights.find(w => w.weight_id === tab.weight_id);
-                return (
-                  <TabsTrigger key={tab.weight_id} value={tab.weight_id}>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <span>{tab.weight_name}</span>
-                      </PopoverTrigger>
-                      {tab.weight_id !== "overall" && (
-                        <PopoverContent className="w-80">
-                          <h4 className="font-medium mb-1">Weight Info</h4>
-                          <ul className="text-xs space-y-1">
-                            {Object.entries(weightObj!.identifications).map(([key, factor]) => (
-                              <li key={key} className="flex justify-between">
-                                <span className="capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
-                                <span>{(factor * 100).toFixed(1)}%</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </PopoverContent>
-                      )}
-                    </Popover>
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
+            <div className="flex flex-col items-center space-y-1">
+              <TabsList className="flex flex-wrap">
+                {tabs.map(tab => {
+                  const weightObj = weights.find(w => w.weight_id === tab.weight_id);
+                  return (
+                    <TabsTrigger key={tab.weight_id} value={tab.weight_id}>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <span>{tab.weight_name}</span>
+                        </PopoverTrigger>
+                        {tab.weight_id !== "overall" && (
+                          <PopoverContent className="w-80">
+                            <h4 className="font-medium mb-1">Weight Info</h4>
+                            <ul className="text-xs space-y-1">
+                              {Object.entries(weightObj!.identifications).map(([key, factor]) => (
+                                <li key={key} className="flex justify-between">
+                                  <span className="capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
+                                  <span>{(factor * 100).toFixed(1)}%</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </PopoverContent>
+                        )}
+                      </Popover>
+                    </TabsTrigger>
+
+                  );
+                })}
+              </TabsList>
+              <div className="flex items-center space-x-1">
+                <button
+                  onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}
+                  className="p-2 text-sm rounded-lg bg-muted hover:bg-muted/60 transition-colors duration-150"
+                >
+                  {sortOrder === "desc" ? <ArrowDownWideNarrow className="w-5 h-5" /> : <ArrowUpNarrowWide className="w-5 h-5" />}
+                </button>
+
+                <button
+                  onClick={() => setShinyOnly(!shinyOnly)}
+                  className={`p-2 text-sm font-sans rounded-lg transition-colors duration-150 ${shinyOnly ? "bg-yellow-300 text-black" : "bg-muted hover:bg-muted/60"
+                    }`}
+                >
+                  Shiny Only
+                  {/* {shinyOnly ? "Shiny" : "Shiny"} */}
+                </button>
+
+              </div>
+            </div>
 
             {tabs.map(tab => {
               // Determine which weight object (or undefined for overall)
@@ -151,13 +176,14 @@ export default function ItemWeightedLB({ item, open, onClose }: { item: Item; op
 
               // rank entries
               const ranked = verifiedItems
+                .filter(v => !shinyOnly || v.shinyStat) // ← filter shiny if toggle is on
                 .map(v => ({ ...v, score: calculateScore(v, weightObj) }))
-                .sort((a, b) => b.score - a.score)
+                .sort((a, b) => sortOrder === "desc" ? b.score - a.score : a.score - b.score)
                 .slice(0, 10);
 
               return (
                 <TabsContent key={tab.weight_id} value={tab.weight_id}>
-                  <div className="mt-4 space-y-3">
+                  <div className="space-y-3">
                     {ranked.map((entry, i) => {
                       const demoData = { input: entry, original: selectedItem! };
                       return (
