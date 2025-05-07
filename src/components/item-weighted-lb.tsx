@@ -4,10 +4,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { useEffect, useState } from "react";
-import { calculateIdentificationRoll } from "@/lib/identification-utils";
 import { RolledItemDisplay } from "./item/RolledItemDisplay";
 import { CombatItem } from "@/types/itemType";
-import { getRollPercentageString } from "@/lib/itemUtils";
+import { calculateIdentificationRoll, getRollPercentageString } from "@/lib/itemUtils";
 import { ArrowDownWideNarrow, ArrowUpNarrowWide } from "lucide-react";
 
 interface Item { internalName: string; }
