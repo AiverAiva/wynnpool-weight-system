@@ -13,6 +13,9 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  session: {
+    strategy: "jwt", // ✅ enables stateless, faster session handling
+  },
   callbacks: {
     async jwt({ token, account }) {
       // Store access_token from the provider
