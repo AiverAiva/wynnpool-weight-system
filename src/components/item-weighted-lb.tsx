@@ -89,7 +89,13 @@ export default function ItemWeightedLB({ item, open, onClose }: { item: Item; op
     return keys.reduce((acc, key) => {
       const inputVal = entry.identifications[key];
       const { formattedPercentage } = calculateIdentificationRoll(key, idRanges[key], inputVal);
-      return acc + (formattedPercentage / 100) * (weight.identifications[key] || 0);
+      if (weight.identifications[key] < 0) {
+        // If the weight is negative, we need to invert the percentage
+        const invertedPercentage = 100 - formattedPercentage;
+        return acc + Math.abs((invertedPercentage / 100) * (weight.identifications[key] || 0));
+      } else {
+        return acc + (formattedPercentage / 100) * (weight.identifications[key] || 0);
+      }
     }, 0);
   }
 
