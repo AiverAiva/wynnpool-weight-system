@@ -56,15 +56,17 @@ export async function PATCH(
 
 
   // Send webhook
-  await sendToWebhook({
-    action: "updated",
-    author: token.name || token.sub,
-    item_id: updateFields.item_id,
-    weight_name: updateFields.weight_name,
-    weight_id,
-    description: updateFields.description,
-    diff,
-  });
+  if (updateFields.weight_name !== "test") {
+    await sendToWebhook({
+      action: "updated",
+      author: token.name || token.sub,
+      item_id: updateFields.item_id,
+      weight_name: updateFields.weight_name,
+      weight_id,
+      description: updateFields.description,
+      diff,
+    });
+  }
 
   return new Response(JSON.stringify({ success: true }), { status: 200 });
 }
@@ -96,19 +98,21 @@ export async function DELETE(
   }
 
   // Send webhook with full identifications
-  await sendToWebhook({
-    action: "deleted",
-    author: token.name || token.sub,
-    item_id: existing.item_id,
-    weight_name: existing.weight_name,
-    weight_id,
-    description: existing.description,
-    diff: Object.fromEntries(
-      Object.entries(existing.identifications).map(
-        ([key, val]) => [key, { old: val as number }]
+  if (existing.weight_name !== "test") {
+    await sendToWebhook({
+      action: "deleted",
+      author: token.name || token.sub,
+      item_id: existing.item_id,
+      weight_name: existing.weight_name,
+      weight_id,
+      description: existing.description,
+      diff: Object.fromEntries(
+        Object.entries(existing.identifications).map(
+          ([key, val]) => [key, { old: val as number }]
+        )
       )
-    )
-  });
+    });
+  }
 
   return new Response(JSON.stringify({ success: true }), { status: 200 });
 }

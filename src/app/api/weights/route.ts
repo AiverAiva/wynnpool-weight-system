@@ -34,16 +34,18 @@ export async function POST(req: NextRequest) {
         timestamp: Date.now(),
     };
 
-    await sendToWebhook({
-        action: "created",
-        author: token.name || token.sub,
-        item_id: newWeight.item_id,
-        weight_name: newWeight.weight_name,
-        weight_id: newWeight.weight_id,
-        diff: Object.fromEntries(
-            Object.entries(newWeight.identifications).map(([k, v]) => [k, { new: v as number }])
-        ),
-    });
+    if (newWeight.weight_name !== "test") {
+        await sendToWebhook({
+            action: "created",
+            author: token.name || token.sub,
+            item_id: newWeight.item_id,
+            weight_name: newWeight.weight_name,
+            weight_id: newWeight.weight_id,
+            diff: Object.fromEntries(
+                Object.entries(newWeight.identifications).map(([k, v]) => [k, { new: v as number }])
+            ),
+        });
+    }
     await weightData.insertOne(newWeight);
     return new Response(JSON.stringify({ success: true }), { status: 201 });
 }
