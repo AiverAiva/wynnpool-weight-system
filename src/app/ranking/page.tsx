@@ -79,6 +79,7 @@ export default function RankingPage() {
     <div className="min-h-screen bg-background">
       <div className="mt-[80px]" />
       <main className="container mx-auto p-6 max-w-screen-lg duration-150">
+        <span className="text-3xl text-red-600 font-bold">This page will be deprecated soon, head to <Link href="https://www.wynnpool.com/item/ranking">wynnpool.com/item/ranking</Link></span>
         <div className="flex justify-between items-center mb-4">
           <div>
             <h1 className="text-3xl font-bold">Mythic Weapon Rankings</h1>

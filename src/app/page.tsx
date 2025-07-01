@@ -80,6 +80,7 @@ export default function MythicItemsPage() {
     <div className="min-h-screen bg-background">
       <div className="mt-[80px]" />
       <main className="container mx-auto p-6 max-w-screen-lg duration-150">
+        <span className="text-3xl text-red-600 font-bold">This page will be deprecated soon, head to <Link href="https://www.wynnpool.com/item/weight">wynnpool.com/item/weight</Link></span>
         <h1 className="text-3xl font-bold">If you have any questions about the weighting systems</h1>
         <h1 className="text-3xl font-bold">I encourage you to ask at: <Link className="font-bold cursor-pointer text-blue-500 hover:text-blue-700 transition-color duration-150" href='https://discord.gg/QZn4Qk3mSP'>Wynnpool Discord</Link></h1>
         {/* <h1 className="text-2xl font-bold">Mythic Items</h1> */}
